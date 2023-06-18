@@ -3,6 +3,30 @@
     "src"
   ],
   "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "types/*": [
+        "types/*"
+      ],
+      "api/*": [
+        "api/*"
+      ],
+      "utils/*": [
+        "utils/*"
+      ],
+      "mocks/*": [
+        "mocks/*"
+      ],
+      "model/*": [
+        "model/*"
+      ],
+      "view/*": [
+        "view/*"
+      ],
+      "presenter/*": [
+        "presenter/*"
+      ],
+    },
     "target": "ES2020",
     "module": "ES2020",
     "lib": [
@@ -18,13 +42,11 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    /* Linting Type Checking */
+    /* Strict Type Checking */
     "strict": true, // Строгий режим
-    "alwaysStrict": true, // Гарантирует, что ваши файлы анализируются в строгом режиме
+    /* Additional Type Checking */
     "allowUnusedLabels": false, // Разрешить неиспользуемые лэйблы
     "allowUnreachableCode": false, // Разрешить неисползуемый код
-    "noImplicitAny": true, // Нет неявного типа Any
-    "noImplicitThis": true, // Нет неявного this
     "noImplicitReturns": false, // Нет неявных возвратов return
     "noImplicitOverride": true, // Нет неявного переопределения в клаасах Override
     "noUnusedLocals": true, // Нет неиспользуемых локальные переменных

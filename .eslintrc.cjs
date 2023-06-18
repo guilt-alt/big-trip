@@ -1,5 +1,3 @@
-const { resolve } = require('path');
-
 module.exports = {
   'env': {
     'es2020': true,
@@ -18,14 +16,14 @@ module.exports = {
     'import/resolver': {
       'alias': {
         'map': [
-          ['@', resolve(__dirname, './src')],
-          ['@api', resolve(__dirname, './src/js/api/')],
-          ['@utils', resolve(__dirname, './src/js/utils')],
-          ['@mocks', resolve(__dirname, './src/js/mocks')],
-          ['@model', resolve(__dirname, './src/js/model')],
-          ['@view', resolve(__dirname, './src/js/view')],
-          ['@presenter', resolve(__dirname, './src/js/presenter')],
-        ],
+          ['types', './src/types/'],
+          ['api', './src/api/'],
+          ['utils', './src/utils'],
+          ['mocks', './src/mocks'],
+          ['model', './src/model'],
+          ['view', './src/view'],
+          ['presenter', './src/presenter'],
+        ]
       }
     }
   }

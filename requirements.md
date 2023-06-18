@@ -25,6 +25,7 @@ npm i eslint@7.13.0 -DE
 * typescript@5.0.2
 
 * eslint@8.42.0
+* eslint-import-resolver-alias@1.1.2
 * eslint-config-airbnb-base@15.0.0
 * eslint-config-airbnb-typescript@17.0.0
 * @typescript-eslint/parser@5.59.9
