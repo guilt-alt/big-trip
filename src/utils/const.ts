@@ -1,4 +1,4 @@
-import { IPosition } from 'type/interface';
+import { IPosition } from 'type/interfaces';
 
 export const EVENTS_COUNT: number = 5;
 
