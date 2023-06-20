@@ -4,14 +4,14 @@
 
 ```bash
 npm i <package>@<version> -E
-npm i dayjs@1.9.5 -E
-npm i eslint@7.13.0 -DE
+npm i dayjs@1.11.8 -E
+npm i eslint@8.42.0 -DE
 ```
 
 ## Зависимости приложения (`dependencies`)
 
 * he@1.2.0
-* dayjs@1.9.5
+* dayjs@1.11.8
 * flatpickr@4.6.6
 * chart.js@2.9.4
 * chartjs-plugin-datalabels@0.7.0
