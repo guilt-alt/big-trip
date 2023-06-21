@@ -3,15 +3,16 @@ import FiltersView from 'view/filters';
 import SortView from 'view/sort';
 import TripInfoView from 'view/trip-info';
 import ListView from 'view/list';
+import ListEmpty from 'view/list-empty';
 import PointView from 'view/point';
 
 import { events } from 'mocks/event';
 
-import render from 'utils/render';
-import { RenderPosition, EVENTS_COUNT } from 'utils/const';
+import { EVENTS_COUNT } from 'utils/const';
+import { render, RenderPosition } from 'utils/render';
 
 // import NewPointView from "view/new-point";
-import EditFormView from 'view/edit-form';
+// import EditFormView from 'view/edit-point';
 
 const pageHeader = document.querySelector('.page-header')!;
 const tripMainElement = pageHeader.querySelector('.trip-main')!;
@@ -19,15 +20,18 @@ const tripControlsElement = tripMainElement.querySelector('.trip-main__trip-cont
 const pageMain = document.querySelector('.page-body__page-main')!;
 const tripEventsSection = pageMain.querySelector('.trip-events')!;
 
-render(tripMainElement, TripInfoView(events), RenderPosition.AFTERBEGIN);
-render(tripControlsElement, MenuView(), RenderPosition.AFTERBEGIN);
-render(tripControlsElement, FiltersView(), RenderPosition.BEFOREEND);
-render(tripEventsSection, SortView(), RenderPosition.BEFOREEND);
-render(tripEventsSection, ListView(), RenderPosition.BEFOREEND);
+render(tripControlsElement, new MenuView().Element, RenderPosition.AFTERBEGIN);
+render(tripControlsElement, new FiltersView().Element, RenderPosition.BEFOREEND);
+render(tripEventsSection, new SortView().Element, RenderPosition.BEFOREEND);
 
-const tripList = tripEventsSection.querySelector('.trip-events__list')!;
-render(tripList, EditFormView(events[0]!), RenderPosition.BEFOREEND);
+const tripList = new ListView();
+render(tripEventsSection, tripList.Element, RenderPosition.BEFOREEND);
 
-for (let i = 0; i < EVENTS_COUNT; i += 1) {
-  render(tripList, PointView(events[i]!), RenderPosition.BEFOREEND);
+if (events.length) {
+  render(tripMainElement, new TripInfoView(events).Element, RenderPosition.AFTERBEGIN);
+  for (let i = 0; i < EVENTS_COUNT; i += 1) {
+    render(tripList.Element!, new PointView(events[i]!).Element, RenderPosition.BEFOREEND);
+  }
+} else {
+  render(tripEventsSection, new ListEmpty().Element, RenderPosition.BEFOREEND);
 }

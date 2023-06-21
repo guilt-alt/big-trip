@@ -1,7 +1,8 @@
 import { IEvent } from 'type/interfaces';
 import { destinations } from 'mocks/event';
+import { createElement } from 'utils/render';
 
-export default (event: IEvent) => {
+const createPoint = (event: IEvent) => {
   const {
     type, startDate, endDate, destination, offers, description, photos, price, id,
   } = event;
@@ -146,3 +147,33 @@ export default (event: IEvent) => {
     </form>`
   );
 };
+
+export default class NewTripPoint {
+  #data: IEvent | null = null;
+
+  #element: Element | null = null;
+
+  constructor(data: IEvent) {
+    this.#data = data;
+  }
+
+  get Template() {
+    if (!this.#data) {
+      return '';
+    }
+
+    return createPoint(this.#data);
+  }
+
+  get Element() {
+    if (!this.#element) {
+      this.#element = createElement(this.Template);
+    }
+
+    return this.#element;
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

@@ -1,14 +1,14 @@
 import { createElement } from 'utils/render';
 
-const createList = (): string => '<ul class="trip-events__list"></ul>';
+const createLoading = () => '<p class="trip-events__msg">Loading...</p>';
 
-export default class TripList {
+export default class ListLoading {
   #element: Element | null = null;
 
-  #createList: string = createList();
+  #createLoading: string = createLoading();
 
   get Template() {
-    return this.#createList;
+    return this.#createLoading;
   }
 
   get Element() {
