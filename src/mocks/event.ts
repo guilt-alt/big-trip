@@ -3,15 +3,10 @@ import { getRandomInt } from 'utils/common';
 
 import { IOffer, IEvent } from 'type/interfaces';
 
-const MAX_OFFERS_AMOUNT = 5;
-const MAX_TRIP_TIME = 7;
-const MAX_PHOTOS_AMOUNT = 5;
-const CARDS_AMOUNT = 20;
-
-const Price = {
-  min: 10,
-  max: 100,
-};
+import {
+  MAX_TRIP_TIME, Price,
+  CARDS_AMOUNT, MAX_OFFERS_AMOUNT, MAX_PHOTOS_AMOUNT,
+} from 'utils/const';
 
 const offers: IOffer[] = [
   {
@@ -101,7 +96,7 @@ const text: string[] = [
   'Loves cheeseburgers more napping, more napping all the napping is exhausting cat playing a fiddle in hey diddle diddle? so lick arm hair so i like big cats and i can not lie or meeeeouw.',
 ];
 
-const destinations: string[] = ['Amsterdam', 'Geneva', 'Chamonix', 'Monaco'];
+export const destinations: string[] = ['Amsterdam', 'Geneva', 'Chamonix', 'Monaco'];
 
 const getRandomPhoto = (): string => `http://picsum.photos/248/152?r=${Math.random()}`;
 
@@ -170,6 +165,4 @@ export const generateEventCards = (amount: number): IEvent[] => {
     );
 };
 
-const events = generateEventCards(CARDS_AMOUNT);
-
-export { offers, destinations, events };
+export const events = generateEventCards(CARDS_AMOUNT);

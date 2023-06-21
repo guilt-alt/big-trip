@@ -1,7 +1,8 @@
 import { IEvent } from 'type/interfaces';
+import { createElement } from 'utils/render';
 import { getEventDuration } from 'utils/common';
 
-export default (data: IEvent): string => {
+const createPoint = (data: IEvent): string => {
   const {
     startDate, endDate, type, destination, offers, price, favourite,
   } = data;
@@ -14,12 +15,14 @@ export default (data: IEvent): string => {
 
   const duration = getEventDuration(startDate, endDate);
 
-  const offersList = offers.map((offer) => (
-    `<li class= "event__offer">
-      <span class="event__offer-title">${offer.name}</span>
-      &plus; &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-    </li>`
-  )).join('');
+  const offersList = offers
+    .filter(({ checked }) => checked === true)
+    .map((offer) => (
+      `<li class= "event__offer">
+        <span class="event__offer-title">${offer.name}</span>
+        &plus; &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+      </li>`
+    )).join('');
 
   return (
     `<li class="trip-events__item">
@@ -57,3 +60,33 @@ export default (data: IEvent): string => {
     </li>`
   );
 };
+
+export default class TripPoint {
+  #data: IEvent | null = null;
+
+  #element: Element | null = null;
+
+  constructor(data: IEvent) {
+    this.#data = data;
+  }
+
+  get Template() {
+    if (!this.#data) {
+      return '';
+    }
+
+    return createPoint(this.#data);
+  }
+
+  get Element() {
+    if (!this.#element) {
+      this.#element = createElement(this.Template);
+    }
+
+    return this.#element;
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

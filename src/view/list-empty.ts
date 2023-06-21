@@ -1,14 +1,14 @@
 import { createElement } from 'utils/render';
 
-const createList = (): string => '<ul class="trip-events__list"></ul>';
+const createEmptyList = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
 
-export default class TripList {
+export default class ListEmpty {
   #element: Element | null = null;
 
-  #createList: string = createList();
+  #createEmptyList: string = createEmptyList();
 
   get Template() {
-    return this.#createList;
+    return this.#createEmptyList;
   }
 
   get Element() {
