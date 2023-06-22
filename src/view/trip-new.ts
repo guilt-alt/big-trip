@@ -1,6 +1,6 @@
 import { IEvent } from 'type/interfaces';
+import AbstractView from 'type/abstract-view';
 import { destinations } from 'mocks/event';
-import { createElement } from 'utils/render';
 
 const createPoint = (event: IEvent) => {
   const {
@@ -126,7 +126,7 @@ const createPoint = (event: IEvent) => {
                         <span class="event__offer-price">${offer.price}</span>
                       </label>
                     </div>`).join('')
-    }
+      }
           </div>
           </section>`
     }
@@ -148,32 +148,19 @@ const createPoint = (event: IEvent) => {
   );
 };
 
-export default class NewTripPoint {
+export default class NewTripPoint extends AbstractView {
   #data: IEvent | null = null;
 
-  #element: Element | null = null;
-
   constructor(data: IEvent) {
+    super();
     this.#data = data;
   }
 
-  get Template() {
+  get template() {
     if (!this.#data) {
       return '';
     }
 
     return createPoint(this.#data);
-  }
-
-  get Element() {
-    if (!this.#element) {
-      this.#element = createElement(this.Template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

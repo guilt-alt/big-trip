@@ -1,6 +1,6 @@
 import { IEvent, IOffer } from 'type/interfaces';
+import AbstractView from 'type/abstract-view';
 import { destinations } from 'mocks/event';
-import { createElement } from 'utils/render';
 
 const createOffers = (offers: IOffer[], id: number): string => {
   if (!offers.length) {
@@ -172,32 +172,19 @@ const createEditForm = (event: IEvent) => {
   );
 };
 
-export default class EditForm {
+export default class EditForm extends AbstractView {
   #data: IEvent | null = null;
 
-  #element: Element | null = null;
-
   constructor(data: IEvent) {
+    super();
     this.#data = data;
   }
 
-  get Template() {
+  get template() {
     if (!this.#data) {
       return '';
     }
 
     return createEditForm(this.#data);
-  }
-
-  get Element() {
-    if (!this.#element) {
-      this.#element = createElement(this.Template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

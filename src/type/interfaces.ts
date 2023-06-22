@@ -1,10 +1,5 @@
 import { Dayjs } from 'dayjs';
 
-export type IPosition = {
-  AFTERBEGIN: InsertPosition;
-  BEFOREEND: InsertPosition;
-};
-
 export type IOffer = {
   name: string;
   type: string;

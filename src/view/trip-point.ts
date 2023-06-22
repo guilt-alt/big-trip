@@ -1,5 +1,5 @@
 import { IEvent } from 'type/interfaces';
-import { createElement } from 'utils/render';
+import AbstractView from 'type/abstract-view';
 import { getEventDuration } from 'utils/common';
 
 const createPoint = (data: IEvent): string => {
@@ -61,32 +61,19 @@ const createPoint = (data: IEvent): string => {
   );
 };
 
-export default class TripPoint {
+export default class TripPoint extends AbstractView {
   #data: IEvent | null = null;
 
-  #element: Element | null = null;
-
   constructor(data: IEvent) {
+    super();
     this.#data = data;
   }
 
-  get Template() {
+  get template() {
     if (!this.#data) {
       return '';
     }
 
     return createPoint(this.#data);
-  }
-
-  get Element() {
-    if (!this.#element) {
-      this.#element = createElement(this.Template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

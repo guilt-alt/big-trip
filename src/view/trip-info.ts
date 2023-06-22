@@ -1,5 +1,5 @@
 import { IEvent } from 'type/interfaces';
-import { createElement } from 'utils/render';
+import AbstractView from 'type/abstract-view';
 import { getTripCost, getTripDates, getTripRoute } from 'utils/common';
 
 const createTripInfo = (events: IEvent[]): string => {
@@ -12,7 +12,7 @@ const createTripInfo = (events: IEvent[]): string => {
       <div class="trip-info__main">
         <h1 class="trip-info__title">${tripRoute}</h1>
 
-        <p class="trip-info__dates">${tripStartDate} — ${tripEndDate}</p>
+        <p class="trip-info__dates">${tripStartDate}&nbsp;&mdash;&nbsp;${tripEndDate}</p>
       </div>
 
       <p class="trip-info__cost">
@@ -22,32 +22,19 @@ const createTripInfo = (events: IEvent[]): string => {
   );
 };
 
-export default class TripInfo {
+export default class TripInfo extends AbstractView {
   #data: IEvent[] | null = null;
 
-  #element: Element | null = null;
-
   constructor(data: IEvent[]) {
+    super();
     this.#data = data;
   }
 
-  get Template() {
+  get template() {
     if (!this.#data) {
       return '';
     }
 
     return createTripInfo(this.#data);
-  }
-
-  get Element() {
-    if (!this.#element) {
-      this.#element = createElement(this.Template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

@@ -32,8 +32,8 @@ export const getTripRoute = (cards: IEvent[]): string => {
   const cities = [...new Set(cards.map((card) => card.destination))];
 
   return cities.length > 3
-    ? `${cities[0]} — ... — ${cities[cities.length - 1]}`
-    : `${cities.join(' — ')}`;
+    ? `${cities[0]} &mdash; ... &mdash; ${cities[cities.length - 1]}`
+    : `${cities.join(' &mdash; ')}`;
 };
 
 export const getTripDates = (cards: IEvent[]) => {

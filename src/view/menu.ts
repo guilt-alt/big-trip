@@ -1,33 +1,16 @@
-import { createElement } from 'utils/render';
+import AbstractView from 'type/abstract-view';
 
 const createMenu = (): string => (
-  `<div>
-    <h2 class="visually-hidden">Switch trip view</h2>
-    <nav class="trip-controls__trip-tabs trip-tabs">
-      <a class="trip-tabs__btn trip-tabs__btn--active" href="#">Table</a>
-      <a class="trip-tabs__btn" href="#">Stats</a>
-    </nav>
-  </div>`
+  `<nav class="trip-controls__trip-tabs trip-tabs">
+    <a class="trip-tabs__btn trip-tabs__btn--active" href="#">Table</a>
+    <a class="trip-tabs__btn" href="#">Stats</a>
+  </nav>`
 );
 
-export default class Menu {
-  #element: Element | null = null;
+export default class Menu extends AbstractView {
+  #staticTemplate: string = createMenu();
 
-  #createMenu: string = createMenu();
-
-  get Template() {
-    return this.#createMenu;
-  }
-
-  get Element() {
-    if (!this.#element) {
-      this.#element = createElement(this.Template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+  get template() {
+    return this.#staticTemplate;
   }
 }
