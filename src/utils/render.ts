@@ -1,10 +1,3 @@
-import { IPosition } from 'type/interfaces';
-
-export const RenderPosition: IPosition = {
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-};
-
 export const createElement = (template: string) => {
   const newElement = document.createElement('div');
   newElement.innerHTML = template;
@@ -13,20 +6,22 @@ export const createElement = (template: string) => {
 };
 
 export const render = (
-  container: Element,
-  content: ChildNode | null,
+  element: Element,
+  content: Element,
   position: InsertPosition,
 ): void => {
-  if (!content) {
-    throw new Error('Can render only ChildNode');
-  }
-
   switch (position) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(content);
+    case 'afterbegin':
+      element.insertAdjacentElement(position, content);
       break;
-    case RenderPosition.BEFOREEND:
-      container.append(content);
+    case 'afterend':
+      element.insertAdjacentElement(position, content);
+      break;
+    case 'beforeend':
+      element.insertAdjacentElement(position, content);
+      break;
+    case 'beforebegin':
+      element.insertAdjacentElement(position, content);
       break;
     default:
       throw new Error('Ни один кейс не совпал.');

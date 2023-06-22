@@ -1,25 +1,11 @@
-import { createElement } from 'utils/render';
+import AbstractView from 'type/abstract-view';
 
 const createLoading = () => '<p class="trip-events__msg">Loading...</p>';
 
-export default class ListLoading {
-  #element: Element | null = null;
+export default class ListLoading extends AbstractView {
+  #staticTemplate: string = createLoading();
 
-  #createLoading: string = createLoading();
-
-  get Template() {
-    return this.#createLoading;
-  }
-
-  get Element() {
-    if (!this.#element) {
-      this.#element = createElement(this.Template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
+  get template() {
+    return this.#staticTemplate;
   }
 }
