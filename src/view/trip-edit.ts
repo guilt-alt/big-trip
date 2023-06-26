@@ -1,5 +1,5 @@
+import AbstractView from 'type/view-classes';
 import { IEvent, IOffer } from 'type/interfaces';
-import AbstractView from 'type/abstract-view';
 import { destinations } from 'mocks/event';
 
 const createOffers = (offers: IOffer[], id: number): string => {
@@ -172,7 +172,7 @@ const createEditForm = (event: IEvent) => {
   );
 };
 
-export default class EditForm extends AbstractView {
+export default class EditPoint extends AbstractView {
   #data: IEvent | null = null;
 
   constructor(data: IEvent) {
@@ -187,4 +187,19 @@ export default class EditForm extends AbstractView {
 
     return createEditForm(this.#data);
   }
+
+  set closeFormHandler(callback: Function) {
+    this.callback.close = callback;
+
+    this.element
+      .querySelector('.event__rollup-btn')
+      ?.addEventListener('click', this.#closeFormHandler);
+  }
+
+  #closeFormHandler = (e: Event) => {
+    e.preventDefault();
+
+    if (!this.callback.close) return;
+    this.callback.close();
+  };
 }

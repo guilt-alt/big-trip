@@ -145,7 +145,7 @@ const generateEventCard = (): IEvent => {
       .map(getRandomPhoto),
     description: generateDescription(text),
     price: getRandomInt(Price.min, Price.max),
-    favourite: Boolean(getRandomInt()),
+    favorite: Boolean(getRandomInt()),
   };
 };
 

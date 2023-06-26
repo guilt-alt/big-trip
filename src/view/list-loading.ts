@@ -1,4 +1,4 @@
-import AbstractView from 'type/abstract-view';
+import AbstractView from 'type/view-classes';
 
 const createLoading = () => '<p class="trip-events__msg">Loading...</p>';
 

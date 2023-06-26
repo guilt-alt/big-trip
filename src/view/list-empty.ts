@@ -1,4 +1,4 @@
-import AbstractView from 'type/abstract-view';
+import AbstractView from 'type/view-classes';
 
 const createEmptyList = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
 

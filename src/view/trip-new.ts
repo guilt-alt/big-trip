@@ -1,5 +1,5 @@
+import AbstractView from 'type/view-classes';
 import { IEvent } from 'type/interfaces';
-import AbstractView from 'type/abstract-view';
 import { destinations } from 'mocks/event';
 
 const createPoint = (event: IEvent) => {
@@ -126,7 +126,7 @@ const createPoint = (event: IEvent) => {
                         <span class="event__offer-price">${offer.price}</span>
                       </label>
                     </div>`).join('')
-      }
+    }
           </div>
           </section>`
     }

@@ -1,4 +1,4 @@
-import AbstractView from 'type/abstract-view';
+import AbstractView from 'type/view-classes';
 
 const createList = (): string => '<ul class="trip-events__list"></ul>';
 
