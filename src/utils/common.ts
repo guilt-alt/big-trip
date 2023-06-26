@@ -7,6 +7,8 @@ dayjs.extend(duration);
 
 const addZeroToNumber = (num: number): string | number => (num < 10 ? `0${num}` : num);
 
+export const isEscKeyDown = (e: KeyboardEvent): boolean => (e.key === 'Escape' || e.key === 'Esc');
+
 export const getRandomInt = (min: number = 0, max: number = 1): number => {
   const lower: number = Math.ceil(Math.min(min, max));
   const upper: number = Math.floor(Math.max(min, max));
@@ -50,3 +52,17 @@ export const getTripCost = (cards: IEvent[]) => cards.reduce(((cardsAcc, card) =
 
   return selectedOffersTotalPrice + cardsAcc + card.price;
 }), 0);
+
+export const updateItem = (items: IEvent[], update: IEvent) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};

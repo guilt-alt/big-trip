@@ -1,3 +1,7 @@
+import AbstractView from 'type/view-classes';
+
+type TAbstract = AbstractView | Element;
+
 export const createElement = (template: string) => {
   const newElement = document.createElement('div');
   newElement.innerHTML = template;
@@ -6,10 +10,13 @@ export const createElement = (template: string) => {
 };
 
 export const render = (
-  element: Element,
-  content: Element,
+  container: TAbstract,
+  child: TAbstract,
   position: InsertPosition,
-): void => {
+) => {
+  const element = container instanceof AbstractView ? container.element : container;
+  const content = child instanceof AbstractView ? child.element : child;
+
   switch (position) {
     case 'afterbegin':
       element.insertAdjacentElement(position, content);
@@ -26,4 +33,25 @@ export const render = (
     default:
       throw new Error('Ни один кейс не совпал.');
   }
+};
+
+export const remove = (component: AbstractView) => {
+  component.element.remove();
+  component.removeElement();
+};
+
+export const replace = (
+  oldChildEl: TAbstract,
+  newChildEl: TAbstract,
+) => {
+  const newChild = newChildEl instanceof AbstractView ? newChildEl.element : newChildEl;
+  const oldChild = oldChildEl instanceof AbstractView ? oldChildEl.element : oldChildEl;
+
+  const parent = oldChild.parentElement;
+
+  if (!parent || !oldChild || !newChild) {
+    throw new Error('Can\'t replace unexisting elements');
+  }
+
+  parent.replaceChild(newChild, oldChild);
 };

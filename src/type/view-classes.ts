@@ -1,4 +1,10 @@
+type ICallback = {
+  [key: string]: Function;
+};
+
 export default abstract class AbstractView {
+  protected callback: ICallback = {};
+
   #element: Element | null = null;
 
   #newElement: HTMLDivElement = document.createElement('div');

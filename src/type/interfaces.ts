@@ -18,5 +18,5 @@ export type IEvent = {
   photos: string[];
   description: string;
   price: number;
-  favourite: boolean;
+  favorite: boolean;
 };
