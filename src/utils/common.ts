@@ -1,19 +1,47 @@
 import dayjs, { Dayjs } from 'dayjs';
 import duration, { Duration } from 'dayjs/plugin/duration';
 
+import flatpickr from 'flatpickr';
+import { Hook } from 'flatpickr/dist/types/options';
+import 'flatpickr/dist/flatpickr.min.css';
+
 import { IEvent } from 'type/interfaces';
 
 dayjs.extend(duration);
 
 const addZeroToNumber = (num: number): string | number => (num < 10 ? `0${num}` : num);
 
-export const isEscKeyDown = (e: KeyboardEvent): boolean => (e.key === 'Escape' || e.key === 'Esc');
+export const isEscKeyDown = ({ key }: KeyboardEvent): boolean => (key === 'Escape' || key === 'Esc');
 
 export const getRandomInt = (min: number = 0, max: number = 1): number => {
   const lower: number = Math.ceil(Math.min(min, max));
   const upper: number = Math.floor(Math.max(min, max));
 
   return Math.floor(lower + Math.random() * (upper - lower + 1));
+};
+
+export const checkDurationIsValid = (
+  start: HTMLInputElement,
+  end: HTMLInputElement,
+  data: IEvent,
+) => {
+  const startElement = start;
+  const endElement = end;
+
+  if (data.startDate.diff(data.endDate, 'minute') >= 0) {
+    startElement.style.border = '3px solid #ffd054';
+    startElement.style.borderRadius = '5px';
+
+    startElement.setCustomValidity('The start of the event can\'t be later than the end');
+    startElement.reportValidity();
+
+    endElement.disabled = true;
+    return;
+  }
+
+  startElement.style.border = 'none';
+  startElement.setCustomValidity('');
+  endElement.disabled = false;
 };
 
 export const getEventDuration = (startDate: Dayjs, endDate: Dayjs) => {
@@ -46,7 +74,7 @@ export const getTripDates = (cards: IEvent[]) => {
 };
 
 export const getTripCost = (cards: IEvent[]) => cards.reduce(((cardsAcc, card) => {
-  const selectedOffersTotalPrice = card.offers
+  const selectedOffersTotalPrice = Object.values(card.offers)
     .filter((offer) => offer.checked)
     .reduce(((offersAcc, offer) => offersAcc + offer.price), 0);
 
@@ -66,3 +94,25 @@ export const updateItem = (items: IEvent[], update: IEvent) => {
     ...items.slice(index + 1),
   ];
 };
+
+export const pickDate = (
+  target: HTMLInputElement,
+  minDate: Date | number,
+  defaultDate: Date,
+  onChangeHandler: Hook,
+  onCloseHandler: Hook,
+) => flatpickr(
+  target,
+  {
+    enableTime: true,
+    time_24hr: true,
+    altInput: true,
+    altFormat: 'd/m/y H:i',
+    dateFormat: 'Y-m-d',
+    allowInput: true,
+    minDate,
+    defaultDate,
+    onChange: onChangeHandler,
+    onClose: onCloseHandler,
+  },
+);

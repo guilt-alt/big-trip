@@ -1,4 +1,4 @@
-import AbstractView from 'type/view-classes';
+import AbstractView from 'type/abstract-view';
 import { IEvent } from 'type/interfaces';
 import { getTripCost, getTripDates, getTripRoute } from 'utils/common';
 
@@ -23,7 +23,7 @@ const createTripInfo = (events: IEvent[]): string => {
 };
 
 export default class TripInfo extends AbstractView {
-  #data: IEvent[] | null = null;
+  #data: IEvent[];
 
   constructor(data: IEvent[]) {
     super();
@@ -31,10 +31,6 @@ export default class TripInfo extends AbstractView {
   }
 
   get template() {
-    if (!this.#data) {
-      return '';
-    }
-
     return createTripInfo(this.#data);
   }
 }

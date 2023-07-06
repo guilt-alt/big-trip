@@ -1,13 +1,18 @@
-import AbstractView from 'type/view-classes';
-import { IEvent, IOffer } from 'type/interfaces';
-import { destinations } from 'mocks/event';
+import dayjs from 'dayjs';
+import { Instance as Flatpickr } from 'flatpickr/dist/types/instance';
 
-const createOffers = (offers: IOffer[], id: number): string => {
-  if (!offers.length) {
-    return '';
-  }
+import SmartView from 'type/smart-view';
+import {
+  IEvent, IOffer, OfferType, Destinations,
+} from 'type/interfaces';
 
-  const offersList = offers.map(({
+import { destinations, getAvailaibleOffers } from 'mocks/event';
+import { pickDate, checkDurationIsValid, isEscKeyDown } from 'utils/common';
+
+const createOffers = (offers: IOffer, id: number): string => {
+  if (!Object.keys(offers).length) return '';
+
+  const offersList = Object.values(offers).map(({
     type, checked, name, price,
   }) => (
     `<div class="event__offer-selector">
@@ -42,7 +47,8 @@ const createEditForm = (event: IEvent) => {
 
   const formatedEndDate = endDate.format('DD/MM/YY HH:mm');
   const formatedStartDate = startDate.format('DD/MM/YY HH:mm');
-  const destinationsList = destinations.map((item) => `<option value="${item}"></option>`).join('');
+
+  const destinationsList = Object.keys(destinations).map((item) => `<option value="${item}">`).join('');
 
   const photosList = createPhotos(photos);
   const offersList = createOffers(offers, id!);
@@ -106,7 +112,7 @@ const createEditForm = (event: IEvent) => {
 
                 <div class="event__type-item">
                   <input id="event-type-check-in-${id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in"
-                  ${type === 'check-in' ? 'checked' : ''}">
+                  ${type === 'check-in' ? 'checked' : ''}>
                   <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-${id}">Check-in</label>
                 </div>
 
@@ -129,7 +135,7 @@ const createEditForm = (event: IEvent) => {
             <label class="event__label  event__type-output" for="event-destination-${id}">
               ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}">
+            <input class="event__input  event__input--destination" id="event-destination-${id}" type="text" name="event-destination" value="${destination}" list="destination-list-${id}" required>
             <datalist id="destination-list-${id}">
               ${destinationsList}
             </datalist>
@@ -137,10 +143,10 @@ const createEditForm = (event: IEvent) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${id}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${formatedStartDate}">
+            <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${formatedStartDate}" required>
             &mdash;
             <label class="visually-hidden" for="event-end-time-${id}">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${formatedEndDate}">
+            <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${formatedEndDate}" required>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -148,7 +154,7 @@ const createEditForm = (event: IEvent) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}">
+            <input class="event__input  event__input--price" id="event-price-${id}" type="text" name="event-price" value="${price}" required>
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -172,21 +178,174 @@ const createEditForm = (event: IEvent) => {
   );
 };
 
-export default class EditPoint extends AbstractView {
-  #data: IEvent | null = null;
+export default class EditPoint extends SmartView {
+  #datepickerStartDate: Flatpickr | null = null;
+
+  #datepickerEndDate: Flatpickr | null = null;
+
+  protected data: IEvent;
 
   constructor(data: IEvent) {
     super();
-    this.#data = data;
+    this.data = data;
+
+    this.#removeDocumentHandlers();
+    this.#setInnerHandlers();
+    this.#setDatePicker();
   }
 
   get template() {
-    if (!this.#data) {
-      return '';
+    return createEditForm(this.data);
+  }
+
+  protected restoreHandlers() {
+    this.closeFormHandler = this.callback.close!;
+    this.savePointHandler = this.callback.save!;
+    this.#setInnerHandlers();
+    this.#setDatePicker();
+  }
+
+  #setInnerHandlers() {
+    const availableOffers = this.element.querySelector('.event__available-offers');
+
+    if (availableOffers?.childElementCount) {
+      availableOffers?.addEventListener('click', this.#offersClickHandler);
     }
 
-    return createEditForm(this.#data);
+    this.element
+      .querySelector('.event__type-wrapper .event__type-group')
+      ?.addEventListener('change', this.#selectEventTypeHandler);
+    this.element
+      .querySelector('.event__field-group--destination input')
+      ?.addEventListener('blur', this.#destinationInputHandler);
+    this.element
+      .querySelector('.event__field-group--price input')
+      ?.addEventListener('input', this.#priceInputHandler);
   }
+
+  #offersClickHandler = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+
+    if (target.tagName !== 'INPUT' || !this.data) return;
+
+    const state = target.checked;
+    const type = target.name.slice(12) as OfferType;
+
+    this.updateData({
+      offers: {
+        ...this.data.offers,
+        [type]: {
+          ...this.data.offers[type],
+          checked: state,
+        },
+      },
+    }, true);
+  };
+
+  #selectEventTypeHandler = (e: Event) => {
+    e.preventDefault();
+    const target = e.target as HTMLInputElement;
+    const newType = target.value;
+
+    if (target.tagName !== 'INPUT' || !newType) return;
+
+    this.updateData({
+      type: newType,
+      offers: getAvailaibleOffers(newType),
+    });
+  };
+
+  #destinationInputHandler = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.value as Destinations;
+
+    if (value in Destinations === false) {
+      target.setCustomValidity('You must choose actual destination point');
+      target.reportValidity();
+      return;
+    }
+
+    this.updateData({
+      destination: value,
+      photos: destinations[value].photos,
+      description: destinations[value].description,
+    });
+  };
+
+  #priceInputHandler = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+
+    if (!target.value) return;
+    this.updateData({
+      price: parseInt(target.value, 10),
+    }, true);
+  };
+
+  #setDatePicker() {
+    this.#destroyDatePickers();
+
+    this.#datepickerStartDate = pickDate(
+      this.element.querySelector('input[name="event-start-time"]') as HTMLInputElement,
+      Date.now(),
+      this.data.startDate.toDate(),
+      this.#changeStartDateHandler,
+      this.#closeDatePickerHandler,
+    );
+
+    this.#datepickerEndDate = pickDate(
+      this.element.querySelector('input[name="event-end-time"]') as HTMLInputElement,
+      this.data.startDate.toDate(),
+      this.data.endDate.toDate(),
+      this.#changeEndDateHandler,
+      this.#closeDatePickerHandler,
+    );
+  }
+
+  #destroyDatePickers() {
+    this.#datepickerStartDate?.destroy();
+    this.#datepickerEndDate?.destroy();
+    this.#datepickerStartDate = null;
+    this.#datepickerEndDate = null;
+  }
+
+  #closeDatePickerHandler = () => {
+    const start: HTMLInputElement = this.element
+      .querySelector('input[name="event-start-time"] + input') as HTMLInputElement;
+    const end: HTMLInputElement = this.element
+      .querySelector('input[name="event-end-time"] + input') as HTMLInputElement;
+
+    checkDurationIsValid(start, end, this.data);
+  };
+
+  #changeStartDateHandler = ([date]: Date[]) => {
+    this.updateData({
+      startDate: dayjs(date),
+    }, true);
+  };
+
+  #changeEndDateHandler = ([date]: Date[]) => {
+    this.updateData({
+      endDate: dayjs(date),
+    }, true);
+  };
+
+  #removeDocumentHandlers() {
+    document.removeEventListener('keydown', this.#closeFormHandler);
+  }
+
+  set savePointHandler(callback: Function) {
+    this.callback.save = callback;
+
+    (this.element.querySelector('form.event--edit') as HTMLFormElement)
+      ?.addEventListener('submit', this.#savePointHandler);
+  }
+
+  #savePointHandler = (e: SubmitEvent) => {
+    if (!this.callback.save) throw new Error('Save callback is udefined');
+
+    e.preventDefault();
+    this.callback.save(this.data);
+  };
 
   set closeFormHandler(callback: Function) {
     this.callback.close = callback;
@@ -194,12 +353,20 @@ export default class EditPoint extends AbstractView {
     this.element
       .querySelector('.event__rollup-btn')
       ?.addEventListener('click', this.#closeFormHandler);
+    document.addEventListener('keydown', this.#closeFormHandler);
   }
 
-  #closeFormHandler = (e: Event) => {
-    e.preventDefault();
+  #closeFormHandler = (e: Event | KeyboardEvent) => {
+    if (!this.callback.close) throw new Error('Close callback is udefined');
 
-    if (!this.callback.close) return;
-    this.callback.close();
+    const target = e.target as HTMLElement;
+
+    if (('key' in e && isEscKeyDown(e)) || target.matches('.event__rollup-btn')) {
+      e.preventDefault();
+
+      this.callback.close();
+      this.#removeDocumentHandlers();
+      this.#destroyDatePickers();
+    }
   };
 }

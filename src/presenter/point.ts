@@ -1,4 +1,4 @@
-import AbstractView from 'type/view-classes';
+import { AbstractView } from 'type/abstract-view';
 
 import { Mode } from 'type/enums';
 import { IEvent } from 'type/interfaces';
@@ -17,11 +17,11 @@ export default class Point {
 
   #data: IEvent | null = null;
 
-  #container: AbstractView | null = null;
+  #container: AbstractView;
 
-  #changeData: Function | null = null;
+  #changeData: Function;
 
-  #changeMode: Function | null = null;
+  #changeMode: Function;
 
   constructor(container: AbstractView, changeData: Function, changeMode: Function) {
     this.#container = container;
@@ -35,40 +35,11 @@ export default class Point {
     this.#renderTripPoint();
   }
 
-  #renderTripPoint() {
-    if (!this.#container || !this.#data) {
-      return;
-    }
-
-    const prevTripPoint = this.#tripPoint;
-
-    this.#tripPoint = new TripPointView(this.#data);
-    this.#tripPoint.clickFavoriteHandler = this.#handleFavoriteClick;
-    this.#tripPoint.openFormHandler = this.#handleFormOpen;
-
-    if (!prevTripPoint) {
-      render(this.#container, this.#tripPoint, 'beforeend');
-      return;
-    }
-
-    replace(prevTripPoint, this.#tripPoint);
-    remove(prevTripPoint);
-  }
-
-  updatePoint(data: IEvent) {
+  update(data: IEvent) {
     this.#data = data;
-    const prevTripPoint = this.#tripPoint;
 
-    this.#tripPoint = new TripPointView(data);
-    this.#tripPoint.clickFavoriteHandler = this.#handleFavoriteClick;
-    this.#tripPoint.openFormHandler = this.#handleFormOpen;
-
-    if (!prevTripPoint) {
-      throw new Error('Can\'t update unexisted point');
-    }
-
-    replace(prevTripPoint, this.#tripPoint);
-    remove(prevTripPoint);
+    this.#updateForm();
+    this.#updatePoint();
   }
 
   resetView() {
@@ -87,40 +58,98 @@ export default class Point {
     }
   }
 
-  #replacePointToForm() {
-    if (!this.#container || !this.#data || !this.#tripPoint || !this.#changeMode) return;
+  #renderTripPoint() {
+    if (!this.#data) {
+      return;
+    }
+
+    const prevTripPoint = this.#tripPoint;
+
+    this.#tripPoint = new TripPointView(this.#data);
+    this.#tripPoint.openFormHandler = this.#replacePointToForm;
+    this.#tripPoint.clickFavoriteHandler = this.#handleFavoriteClick;
+
+    if (!prevTripPoint) {
+      render(this.#container, this.#tripPoint!, 'beforeend');
+      return;
+    }
+
+    replace(prevTripPoint, this.#tripPoint!);
+    remove(prevTripPoint);
+  }
+
+  #updatePoint() {
+    if (!this.#data) return;
+
+    const prevTripPoint = this.#tripPoint;
+
+    this.#tripPoint = new TripPointView(this.#data);
+    this.#tripPoint.openFormHandler = this.#replacePointToForm;
+    this.#tripPoint.clickFavoriteHandler = this.#handleFavoriteClick;
+
+    if (!prevTripPoint) {
+      throw new Error('Can\'t update unexisted element');
+    }
+
+    replace(prevTripPoint, this.#tripPoint!);
+    remove(prevTripPoint);
+  }
+
+  #updateForm() {
+    if (!this.#data) return;
+
+    const prevEditPoint = this.#editPoint;
 
     this.#editPoint = new EditPointView(this.#data);
-    this.#editPoint.closeFormHandler = this.#handleFormClose;
+    this.#editPoint.savePointHandler = this.#handleFormSave;
+    this.#editPoint.closeFormHandler = this.#replaceFormToPoint;
+
+    if (!prevEditPoint) {
+      throw new Error('Can\'t update unexisted element');
+    }
+
+    replace(prevEditPoint, this.#editPoint);
+    remove(prevEditPoint);
+  }
+
+  #replacePointToForm = () => {
+    if (!this.#data || !this.#tripPoint) return;
+
+    this.#editPoint = new EditPointView(this.#data);
+    this.#editPoint.savePointHandler = this.#handleFormSave;
+    this.#editPoint.closeFormHandler = this.#replaceFormToPoint;
 
     replace(this.#tripPoint, this.#editPoint);
+    remove(this.#tripPoint);
 
     this.#changeMode(this.#data);
     this.#mode = Mode.EDITING;
-  }
+  };
 
-  #replaceFormToPoint() {
-    if (!this.#tripPoint || !this.#editPoint || !this.#changeMode) return;
+  #replaceFormToPoint = () => {
+    if (!this.#data || !this.#editPoint) return;
+
+    this.#tripPoint = new TripPointView(this.#data);
+    this.#tripPoint.openFormHandler = this.#replacePointToForm;
+    this.#tripPoint.clickFavoriteHandler = this.#handleFavoriteClick;
 
     replace(this.#editPoint, this.#tripPoint);
     remove(this.#editPoint);
 
     this.#changeMode(this.#data);
     this.#mode = Mode.DEFAULT;
-  }
-
-  #handleFormOpen = () => {
-    this.#replacePointToForm();
   };
 
-  #handleFormClose = () => {
-    this.#replaceFormToPoint();
+  #handleFormSave = (data: IEvent) => {
+    this.#changeData(
+      data,
+    );
   };
 
   #handleFavoriteClick = () => {
     if (!this.#data) return;
 
-    this.#changeData!(
+    this.#changeData(
       {
         ...this.#data,
         ...{ favorite: !this.#data.favorite },
