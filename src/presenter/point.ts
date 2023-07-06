@@ -1,4 +1,4 @@
-import { AbstractView } from 'type/abstract-view';
+import AbstractView from 'type/abstract-view';
 
 import { Mode } from 'type/enums';
 import { IEvent } from 'type/interfaces';
