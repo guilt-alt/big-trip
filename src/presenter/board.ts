@@ -20,11 +20,11 @@ export default class Board {
 
   #emptyList: EmptyListView = new EmptyListView();
 
-  #points: IEvent[] = [];
+  #points: IEvent[];
 
-  #sourcedPoints: IEvent[] = [];
+  #sourcedPoints: IEvent[];
 
-  #container: Element | null = null;
+  #container: Element;
 
   #currentSortType: SortType = SortType.DEFAULT;
 
@@ -111,7 +111,7 @@ export default class Board {
 
   #handleViewAction = (update: IEvent) => {
     this.#points = updateItem(this.#points, update);
-    this.#pointPresenters.get(update.id)?.updatePoint(update);
+    this.#pointPresenters.get(update.id)?.update(update);
   };
 
   #handleModeChange = (data: IEvent) => {

@@ -22,6 +22,7 @@
     "vite-plugin-image-optimizer": "^1.1.6"
   },
   "dependencies": {
-    "dayjs": "^1.11.8"
+    "dayjs": "^1.11.8",
+    "flatpickr": "^4.6.13"
   }
 }

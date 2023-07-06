@@ -1,4 +1,4 @@
-import AbstractView from 'type/view-classes';
+import AbstractView from 'type/abstract-view';
 import { IEvent } from 'type/interfaces';
 import { getEventDuration } from 'utils/common';
 
@@ -15,7 +15,7 @@ const createPoint = (data: IEvent): string => {
 
   const duration = getEventDuration(startDate, endDate);
 
-  const offersList = offers
+  const offersList = Object.values(offers)
     .filter(({ checked }) => checked === true)
     .map((offer) => (
       `<li class= "event__offer">
@@ -62,7 +62,7 @@ const createPoint = (data: IEvent): string => {
 };
 
 export default class TripPoint extends AbstractView {
-  #data: IEvent | null = null;
+  #data: IEvent;
 
   constructor(data: IEvent) {
     super();
@@ -70,10 +70,6 @@ export default class TripPoint extends AbstractView {
   }
 
   get template() {
-    if (!this.#data) {
-      return '';
-    }
-
     return createPoint(this.#data);
   }
 

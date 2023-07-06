@@ -1,4 +1,4 @@
-import AbstractView from 'type/view-classes';
+import AbstractView from 'type/abstract-view';
 
 const createMenu = (): string => (
   `<nav class="trip-controls__trip-tabs trip-tabs">

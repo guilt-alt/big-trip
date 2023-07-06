@@ -1,4 +1,4 @@
-import AbstractView from 'type/view-classes';
+import AbstractView from 'type/abstract-view';
 
 const createSort = (): string => (
   `<form class="trip-events__trip-sort trip-sort" action="#" method="get">

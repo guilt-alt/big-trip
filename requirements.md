@@ -12,7 +12,7 @@ npm i eslint@8.42.0 -DE
 
 * he@1.2.0
 * dayjs@1.11.8
-* flatpickr@4.6.6
+* flatpickr@4.6.13
 * chart.js@2.9.4
 * chartjs-plugin-datalabels@0.7.0
 
