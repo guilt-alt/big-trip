@@ -1,7 +1,12 @@
 import { Dayjs } from 'dayjs';
-import { IEvent } from 'type/interfaces';
+import { IEvent } from 'types/interfaces';
 
 const getEventDuration = (startDate: Dayjs, endDate: Dayjs) => endDate.diff(startDate);
+
+export const pointsByDefault = (
+  { startDate: startDateA }: IEvent,
+  { startDate: startDateB }: IEvent,
+) => startDateA.diff(startDateB);
 
 export const pointsByPrice = (
   { price: priceA }: IEvent,

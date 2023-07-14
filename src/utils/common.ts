@@ -5,11 +5,21 @@ import flatpickr from 'flatpickr';
 import { Hook } from 'flatpickr/dist/types/options';
 import 'flatpickr/dist/flatpickr.min.css';
 
-import { IEvent } from 'type/interfaces';
+import { IEvent } from 'types/interfaces';
 
 dayjs.extend(duration);
 
 const addZeroToNumber = (num: number): string | number => (num < 10 ? `0${num}` : num);
+
+export const getDuration = (diffInMs: number) => {
+  const time = dayjs.duration(diffInMs);
+
+  const d = time.days() === 0 ? '' : `${time.days()}d`;
+  const h = time.hours() === 0 ? '' : `${time.hours()}h`;
+  const m = time.minutes() === 0 ? '' : `${time.minutes()}m`;
+
+  return `${d} ${h} ${m}`;
+};
 
 export const isEscKeyDown = ({ key }: KeyboardEvent): boolean => (key === 'Escape' || key === 'Esc');
 

@@ -1,97 +1,99 @@
-import { IEvent } from 'type/interfaces';
-import { SortType } from 'type/enums';
+import { IEvent } from 'types/interfaces';
+import { ActionType, SortType, UpdateType } from 'types/enums';
 
-import SortView from 'view/sort';
 import TripListView from 'view/list';
 import EmptyListView from 'view/list-empty';
 
 import PointPresenter from 'presenter/point';
 
-import { render } from 'utils/render';
-import { updateItem } from 'utils/common';
-import { pointsByDuration, pointsByPrice } from 'utils/sort';
-
-type ValueOf<T> = T[keyof T];
+import filter from 'utils/filter';
+import { render, remove } from 'utils/render';
+import { pointsByDefault, pointsByDuration, pointsByPrice } from 'utils/sort';
+import PointModel from 'model/point';
+import NavigationModel from 'model/navigation';
 
 export default class Board {
-  #sort: SortView = new SortView();
+  #tripListView: TripListView = new TripListView();
 
-  #tripList: TripListView = new TripListView();
+  #emptyListView: EmptyListView = new EmptyListView();
 
-  #emptyList: EmptyListView = new EmptyListView();
+  #container: HTMLElement;
 
-  #points: IEvent[];
+  #navModel: NavigationModel;
 
-  #sourcedPoints: IEvent[];
+  #pointModel: PointModel;
 
-  #container: Element;
+  #pointPresenters: Map<number, PointPresenter> = new Map();
 
-  #currentSortType: SortType = SortType.DEFAULT;
-
-  #pointPresenters: Map<ValueOf<IEvent>, PointPresenter> = new Map();
-
-  constructor(container: Element, data: IEvent[]) {
+  constructor(
+    container: HTMLElement,
+    navModel: NavigationModel,
+    pointModel: PointModel,
+  ) {
     this.#container = container;
-    this.#points = data.slice();
-    this.#sourcedPoints = data;
+    this.#navModel = navModel;
+    this.#pointModel = pointModel;
+
+    this.#navModel.addObserver(this.#handleModelEvent);
+    this.#pointModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
-    if (!this.#points) {
+    this.#container.classList.remove('hidden');
+    this.#renderBoard();
+  }
+
+  destroy() {
+    if (!this.#tripListView) return;
+
+    this.#container.classList.add('hidden');
+    remove(this.#tripListView);
+  }
+
+  #getPoints() {
+    const { points } = this.#pointModel;
+    const { sort: sortType } = this.#navModel;
+    const { filter: filterType } = this.#navModel;
+
+    const filteredPoints = filter[filterType](points);
+
+    switch (sortType) {
+      case SortType.PRICE:
+        return filteredPoints.sort(pointsByPrice);
+      case SortType.TIME:
+        return filteredPoints.sort(pointsByDuration);
+      default:
+        return filteredPoints.sort(pointsByDefault);
+    }
+  }
+
+  #renderBoard() {
+    const points = this.#getPoints();
+    const pointsCount = points.length;
+
+    if (!pointsCount) {
       this.#renderEmptyTripList();
       return;
     }
 
-    this.#renderSort();
     this.#renderTripList();
-    this.#renderPoints(this.#points);
+    this.#renderPoints(points);
   }
 
-  #renderSort() {
-    if (!this.#container) return;
-
-    render(this.#container, this.#sort, 'beforeend');
-    this.#sort.changeSortHandler = this.#handleSortChange;
-  }
-
-  #sortPoints(sortType: SortType) {
-    switch (sortType) {
-      case SortType.PRICE:
-        this.#points.sort(pointsByPrice);
-        break;
-      case SortType.TIME:
-        this.#points.sort(pointsByDuration);
-        break;
-      default:
-        this.#points = this.#sourcedPoints.slice();
-    }
-
-    this.#currentSortType = sortType;
-  }
-
-  #handleSortChange = (sortType: SortType) => {
-    if (this.#currentSortType === sortType) return;
-
-    this.#sortPoints(sortType);
-    this.#clearList();
-    this.#renderPoints(this.#points);
-  };
-
-  #clearList() {
+  #clearBoard() {
     this.#pointPresenters.forEach((v) => v.destroy());
     this.#pointPresenters.clear();
+
+    if (this.#tripListView) remove(this.#tripListView);
+    if (this.#emptyListView) remove(this.#emptyListView);
   }
 
   #renderTripList() {
-    if (!this.#container) return;
-
-    render(this.#container, this.#tripList, 'beforeend');
+    render(this.#container, this.#tripListView, 'beforeend');
   }
 
   #renderEmptyTripList() {
-    if (!this.#container) return;
-
-    render(this.#container, this.#emptyList, 'beforeend');
+    render(this.#container, this.#emptyListView, 'beforeend');
   }
 
   #renderPoints(points: IEvent[]) {
@@ -100,23 +102,51 @@ export default class Board {
 
   #renderPoint(point: IEvent) {
     const pointPresenter = new PointPresenter(
-      this.#tripList,
+      this.#tripListView,
       this.#handleViewAction,
       this.#handleModeChange,
     );
-    pointPresenter.init(point);
 
+    if (!point.id) return;
+
+    pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #handleViewAction = (update: IEvent) => {
-    this.#points = updateItem(this.#points, update);
-    this.#pointPresenters.get(update.id)?.update(update);
+  #handleViewAction = (actionType: ActionType, updateType: UpdateType, update: IEvent) => {
+    switch (actionType) {
+      case ActionType.UPDATE_POINT:
+        this.#pointModel.updatePoint(updateType, update);
+        break;
+      case ActionType.ADD_POINT:
+        this.#pointModel.addPoint(updateType, update);
+        break;
+      case ActionType.DELETE_POINT:
+        this.#pointModel.deletePoint(updateType, update);
+        break;
+      default:
+        throw new Error('Unexpected action type');
+    }
+  };
+
+  #handleModelEvent = (updateType: UpdateType, data: IEvent) => {
+    switch (updateType) {
+      case UpdateType.PATCH_UPDATE:
+        this.#pointPresenters.get(data.id!)?.update(data);
+        break;
+      case UpdateType.PATCH_DELETE:
+        this.#pointPresenters.get(data.id!)?.destroy();
+        this.#pointPresenters.delete(data.id!);
+        break;
+      default:
+        this.#clearBoard();
+        this.#renderBoard();
+    }
   };
 
   #handleModeChange = (data: IEvent) => {
     this.#pointPresenters.forEach((v, k) => {
-      if (k !== data.id) v.resetView();
+      if (k !== data.id) v.resetEditing();
     });
   };
 }

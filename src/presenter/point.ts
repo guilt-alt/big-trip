@@ -1,7 +1,7 @@
-import AbstractView from 'type/abstract-view';
+import AbstractView from 'types/classes/abstract-view';
 
-import { Mode } from 'type/enums';
-import { IEvent } from 'type/interfaces';
+import { ActionType, Mode, UpdateType } from 'types/enums';
+import { IEvent } from 'types/interfaces';
 
 import EditPointView from 'view/trip-edit';
 import TripPointView from 'view/trip-point';
@@ -42,7 +42,7 @@ export default class Point {
     this.#updatePoint();
   }
 
-  resetView() {
+  resetEditing() {
     if (this.#mode === Mode.DEFAULT) return;
 
     this.#replaceFormToPoint();
@@ -51,10 +51,12 @@ export default class Point {
   destroy() {
     if (this.#tripPoint) {
       remove(this.#tripPoint);
+      this.#tripPoint = null;
     }
 
     if (this.#editPoint) {
       remove(this.#editPoint);
+      this.#editPoint = null;
     }
   }
 
@@ -103,6 +105,7 @@ export default class Point {
     this.#editPoint = new EditPointView(this.#data);
     this.#editPoint.savePointHandler = this.#handleFormSave;
     this.#editPoint.closeFormHandler = this.#replaceFormToPoint;
+    this.#editPoint.deletePointHandler = this.#handleFormDelete;
 
     if (!prevEditPoint) {
       throw new Error('Can\'t update unexisted element');
@@ -118,6 +121,7 @@ export default class Point {
     this.#editPoint = new EditPointView(this.#data);
     this.#editPoint.savePointHandler = this.#handleFormSave;
     this.#editPoint.closeFormHandler = this.#replaceFormToPoint;
+    this.#editPoint.deletePointHandler = this.#handleFormDelete;
 
     replace(this.#tripPoint, this.#editPoint);
     remove(this.#tripPoint);
@@ -142,6 +146,16 @@ export default class Point {
 
   #handleFormSave = (data: IEvent) => {
     this.#changeData(
+      ActionType.UPDATE_POINT,
+      UpdateType.PATCH_ADD,
+      data,
+    );
+  };
+
+  #handleFormDelete = (data: IEvent) => {
+    this.#changeData(
+      ActionType.DELETE_POINT,
+      UpdateType.PATCH_DELETE,
       data,
     );
   };
@@ -150,6 +164,8 @@ export default class Point {
     if (!this.#data) return;
 
     this.#changeData(
+      ActionType.UPDATE_POINT,
+      UpdateType.PATCH_UPDATE,
       {
         ...this.#data,
         ...{ favorite: !this.#data.favorite },

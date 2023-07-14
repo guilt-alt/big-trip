@@ -5,8 +5,8 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "type/*": [
-        "type/*"
+      "types/*": [
+        "types/*"
       ],
       "api/*": [
         "api/*"

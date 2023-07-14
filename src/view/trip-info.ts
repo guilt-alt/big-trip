@@ -1,5 +1,5 @@
-import AbstractView from 'type/abstract-view';
-import { IEvent } from 'type/interfaces';
+import AbstractView from 'types/classes/abstract-view';
+import { IEvent } from 'types/interfaces';
 import { getTripCost, getTripDates, getTripRoute } from 'utils/common';
 
 const createTripInfo = (events: IEvent[]): string => {

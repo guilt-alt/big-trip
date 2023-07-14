@@ -37,7 +37,7 @@ Destinations,
   photos: string[]
 }>;
 
-export interface IEvent {
+export type IEvent = {
   id?: number;
   type: string;
   destination: string;
@@ -48,4 +48,4 @@ export interface IEvent {
   price: number;
   favorite: boolean;
   offers: IOffer;
-}
+};

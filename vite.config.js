@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const aliasList = {
-  type: resolve(__dirname, './src/type'),
+  types: resolve(__dirname, './src/types'),
   api: resolve(__dirname, './src/api'),
   utils: resolve(__dirname, './src/utils'),
   mocks: resolve(__dirname, './src/mocks'),

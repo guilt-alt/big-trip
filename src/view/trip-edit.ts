@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
 import { Instance as Flatpickr } from 'flatpickr/dist/types/instance';
 
-import SmartView from 'type/smart-view';
+import SmartView from 'types/classes/smart-view';
 import {
   IEvent, IOffer, OfferType, Destinations,
-} from 'type/interfaces';
+} from 'types/interfaces';
 
 import { destinations, getAvailaibleOffers } from 'mocks/event';
 import { pickDate, checkDurationIsValid, isEscKeyDown } from 'utils/common';
@@ -201,6 +201,7 @@ export default class EditPoint extends SmartView {
   protected restoreHandlers() {
     this.closeFormHandler = this.callback.close!;
     this.savePointHandler = this.callback.save!;
+    this.deletePointHandler = this.callback.delete!;
     this.#setInnerHandlers();
     this.#setDatePicker();
   }
@@ -345,6 +346,20 @@ export default class EditPoint extends SmartView {
 
     e.preventDefault();
     this.callback.save(this.data);
+  };
+
+  set deletePointHandler(callback: Function) {
+    this.callback.delete = callback;
+
+    this.element.querySelector('form.event--edit')
+      ?.addEventListener('reset', this.#deletePointHandler);
+  }
+
+  #deletePointHandler = (e: Event) => {
+    if (!this.callback.delete) throw new Error('Delete callback is udefined');
+
+    e.preventDefault();
+    this.callback.delete(this.data);
   };
 
   set closeFormHandler(callback: Function) {
