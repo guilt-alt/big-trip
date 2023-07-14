@@ -16,7 +16,7 @@ module.exports = {
     'import/resolver': {
       'alias': {
         'map': [
-          ['type', './src/type/'],
+          ['types', './src/types/'],
           ['api', './src/api/'],
           ['utils', './src/utils'],
           ['mocks', './src/mocks'],

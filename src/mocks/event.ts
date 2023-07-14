@@ -1,10 +1,10 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { getRandomInt } from 'utils/common';
 
-import { TypesOfCatygories } from 'type/types';
+import { TypesOfCatygories } from 'types/types';
 import {
   IOffer, IEvent, OfferType, Destinations, IDestinations,
-} from 'type/interfaces';
+} from 'types/interfaces';
 
 import {
   MAX_TRIP_TIME, Price,

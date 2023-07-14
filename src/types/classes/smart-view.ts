@@ -1,5 +1,5 @@
+import { IEvent } from 'types/interfaces';
 import AbstractView from './abstract-view';
-import { IEvent } from './interfaces';
 
 export default abstract class SmartView extends AbstractView {
   protected abstract data: IEvent;

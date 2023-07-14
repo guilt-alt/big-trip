@@ -1,5 +1,5 @@
-import AbstractView from 'type/abstract-view';
-import { IEvent } from 'type/interfaces';
+import AbstractView from 'types/classes/abstract-view';
+import { IEvent } from 'types/interfaces';
 import { getEventDuration } from 'utils/common';
 
 const createPoint = (data: IEvent): string => {

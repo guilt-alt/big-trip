@@ -1,4 +1,4 @@
-import AbstractView from 'type/abstract-view';
+import AbstractView from 'types/classes/abstract-view';
 
 type TAbstract = AbstractView | Element;
 

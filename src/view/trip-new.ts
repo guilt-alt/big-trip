@@ -1,5 +1,5 @@
-import AbstractView from 'type/abstract-view';
-import { IEvent, IOffer } from 'type/interfaces';
+import AbstractView from 'types/classes/abstract-view';
+import { IEvent, IOffer } from 'types/interfaces';
 import { destinations } from 'mocks/event';
 
 const createOffers = (offers: IOffer, id: number): string => {

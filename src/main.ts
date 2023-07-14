@@ -1,23 +1,39 @@
 import TripInfoView from 'view/trip-info';
-import MenuView from 'view/menu';
-import FiltersView from 'view/filters';
 
+import NavigationModel from 'model/navigation';
+import PointModel from 'model/point';
+
+import MenuPresenter from 'presenter/menu';
+import FilterPresenter from 'presenter/filter';
+import SortPresenter from 'presenter/sort';
 import BoardPresenter from 'presenter/board';
+import StatsPresenter from 'presenter/stats';
 
 import { events } from 'mocks/event';
 import { render } from 'utils/render';
 
-const tripMainElement = document.querySelector('.trip-main')!;
-const tripControlsTitles = tripMainElement.querySelectorAll('.trip-main__trip-controls h2')!;
+const tripMainElement = document.querySelector('.trip-main') as HTMLElement;
+const tripControlsTitles = tripMainElement.querySelectorAll('.trip-main__trip-controls h2') as NodeListOf<Element>;
+
 const pageMain = document.querySelector('.page-body__page-main')!;
-const tripEventsSection = pageMain.querySelector('.trip-events')!;
+const pointsContainer = pageMain.querySelector('.trip-events') as HTMLElement;
+const statsContainer = pageMain.querySelector('.statistics') as HTMLElement;
 
-if (events.length) {
-  render(tripMainElement, new TripInfoView(events).element, 'afterbegin');
-}
+render(tripMainElement, new TripInfoView(events).element, 'afterbegin');
 
-render(tripControlsTitles[0]!, new MenuView().element, 'afterend');
-render(tripControlsTitles[1]!, new FiltersView().element, 'afterend');
+const navModel = new NavigationModel();
+const pointModel = new PointModel();
 
-const boardPresenter = new BoardPresenter(tripEventsSection, events);
+pointModel.points = events;
+
+const menuPresenter = new MenuPresenter(tripControlsTitles[0] as Element, navModel);
+const filterPresenter = new FilterPresenter(tripControlsTitles[1] as Element, navModel);
+const sortPresenter = new SortPresenter(pointsContainer, navModel);
+const boardPresenter = new BoardPresenter(pointsContainer, navModel, pointModel);
+const statsPresenter = new StatsPresenter(statsContainer, navModel, pointModel);
+
+menuPresenter.init();
+menuPresenter.setPresenters(boardPresenter, statsPresenter);
+filterPresenter.init();
+sortPresenter.init();
 boardPresenter.init();
